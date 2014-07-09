@@ -45,7 +45,10 @@ Fields in C<%args> are:
 
 =item C<use_favicon> => BOOL (optional, default: true)
 
-TODO: write this.
+If true (or omitted or C<undef>), it tries to use the favicon of the Web site providing the feed
+as the statuses' icons.
+
+If it's defined and false, it won't use favicon.
 
 =back
 
@@ -55,17 +58,32 @@ TODO: write this.
 
 =head2 $statuses = $input->parse_string($feed_xml_string)
 
-TODO: write this. no auto-guessing input type... no Filehandle type.
+Convert the given C<$feed_xml_string> into L<BusyBird> C<$statuses>.
+C<parse()> method is an alias for C<parse_string()>.
+
+C<$feed_xml_string> is the XML data to be parsed. It should be a decoded character string.
+
+Return value C<$statuses> is an array-ref of L<BusyBird> status objects.
+
+If C<$feed_xml_string> is invalid, it croaks.
 
 =head2 $statuses = $input->parse_file($feed_xml_filename)
 
-TODO:
+Same as C<parse_string()> except C<parse_file()> reads the file named C<$feed_xml_filename> and converts its content.
+
+=begin comment
+
+... should we accept parameter to specify the file encoding?
+
+=end comment
 
 =head2 $statuses = $input->parse_url($feed_xml_url)
 
 =head2 $statuses = $input->parse_uri($feed_xml_url)
 
-TODO:
+Same as C<parse_string()> except C<parse_url()> downloads the feed XML from C<$feed_xml_url> and converts its content.
+
+C<parse_uri()> method is an alias for C<parse_url()>.
 
 =head1 SEE ALSO
 
