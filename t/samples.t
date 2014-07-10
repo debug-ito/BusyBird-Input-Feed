@@ -1,0 +1,89 @@
+use strict;
+use warnings;
+use Test::More;
+use utf8;
+
+use BusyBird::Input::Feed;
+
+my $input = BusyBird::Input::Feed->new(use_favicon => 0);
+
+## Only the statuses at the head are checked. Only status fields
+## present in the expected statuses are checked.
+
+my @testcases = (
+    { filename => 'rtcpan.rdf',
+      exp_num => 15,
+      exp_partial => [
+          ## If <guid> is not present, use <link>.
+          { id => 'https://rt.cpan.org/Ticket/Display.html?id=84118',
+            text => 'I really beg you to take back the exception catching feature in Future 0.11',
+            busybird => { status_permalink => 'https://rt.cpan.org/Ticket/Display.html?id=84118' },
+            created_at => 'Mon Mar 25 05:09:05 +0000 2013',
+            user => { screen_name => q{rt.cpan.org: Search Queue = 'future'} }},
+          { id => 'https://rt.cpan.org/Ticket/Display.html?id=84188',
+            text => 'Error message is not user-friendly for followed_by(), and_then(), or_else() and repeat()',
+            busybird => { status_permalink => 'https://rt.cpan.org/Ticket/Display.html?id=84188' },
+            created_at => 'Mon Mar 25 05:10:30 +0000 2013',
+            user => { screen_name => q{rt.cpan.org: Search Queue = 'future'} }},
+          { id => 'https://rt.cpan.org/Ticket/Display.html?id=84189',
+            text => 'Behavior of repeat {...} foreach => [] may be counter-intuitive'
+            busybird => { status_permalink => 'https://rt.cpan.org/Ticket/Display.html?id=84189' },
+            created_at => 'Mon Mar 25 05:12:20 +0000 2013',
+            user => { screen_name => q{rt.cpan.org: Search Queue = 'future'}}}
+      ]},
+    { filename => 'slashdot.rss',
+      exp_num => 25,
+      exp_partial => [
+          ## use <guid> for id
+          { id => 'http://slashdot.feedsportal.com/c/35028/f/647410/s/3c35f940/sc/38/l/0Lhardware0Bslashdot0Borg0Cstory0C140C0A70C0A60C0A0A392340Cby0E20A450Ethe0Etop0Especies0Ewill0Eno0Elonger0Ebe0Ehumans0Eand0Ethat0Ecould0Ebe0Ea0Eproblem0Dutm0Isource0Frss10B0Amainlinkanon0Gutm0Imedium0Ffeed/story01.htm',,
+            text => q{By 2045 'The Top Species Will No Longer Be Humans,' and That Could Be a Problem},
+            busybird => { status_permalink => 'http://rss.slashdot.org/~r/Slashdot/slashdot/~3/HdnfMBYoOr4/story01.htm' },
+            created_at => 'Sun Jul 06 03:15:00 UTC 2014',
+            user => { screen_name => 'Slashdot' }},
+          { id => 'http://slashdot.feedsportal.com/c/35028/f/647410/s/3c35c953/sc/32/l/0Lscience0Bslashdot0Borg0Cstory0C140C0A70C0A60C0A0A42540Ctwo0Eearth0Elike0Eexoplanets0Edont0Eactually0Eexist0Dutm0Isource0Frss10B0Amainlinkanon0Gutm0Imedium0Ffeed/story01.htm',
+            text => q{Two Earth-Like Exoplanets Don't Actually Exist},
+            busybird => { status_permalink => 'http://rss.slashdot.org/~r/Slashdot/slashdot/~3/NcsdVQtQOQQ/story01.htm' },
+            created_at => 'Sun Jul 06 00:33:00 UTC 2014',
+            user => { screen_name => 'Slashdot' }},
+      ]},
+    { filename => 'stackoverflow.atom',
+      exp_num => 30,
+      exp_partial => [
+          { id => 'http://stackoverflow.com/q/24593005',
+            text => 'How to write Unit Test for IValidatableObject Model',
+            busybird => { status_permalink => 'http://stackoverflow.com/questions/24593005/how-to-write-unit-test-for-ivalidatableobject-model' },
+            
+            ## use <updated> date
+            created_at => 'Sun Jul 06 05:33:05 UTC 2014',
+            user => { screen_name => 'Recent Questions - Stack Overflow' }},
+          { id => 'http://stackoverflow.com/q/24593002',
+            text => 'hide softkeyboard when it is called from menuitem',
+            busybird => { status_permalink => 'http://stackoverflow.com/questions/24593002/hide-softkeyboard-when-it-is-called-from-menuitem' },
+            created_at => 'Sun Jul 06 05:31:56 UTC 2014',
+            user => { screen_name => 'Recent Questions - Stack Overflow' }},
+      ]},
+    { filename => 'googlejp.atom',
+      exp_num => 25,
+      exp_partial => [
+          { id => 'tag:blogger.com,1999:blog-20042392.post-2515664455683743324',
+
+            ## status text should be decoded.
+            text => 'あたらしい「ごちそうフォト」で、あなたがどんな食通かチェックしましょう。',
+
+            ## if there are multiple <link>s, use rel="alternate".
+            busybird => { status_permalink => 'http://feedproxy.google.com/~r/GoogleJapanBlog/~3/RP_M-WXr_6I/blog-post.html' }
+            created_at => 'Mon Jul 07 11:50:02 +0900 2014',
+            user => { screen_name => 'Google Japan Blog' }},
+          
+          { id => 'tag:blogger.com,1999:blog-20042392.post-4467811587369881889',
+            text => '最新の Chrome Experiment でキック、ドリブル、シュートを楽しもう!',
+            busybird => { status_permalink => 'http://feedproxy.google.com/~r/GoogleJapanBlog/~3/qztQgCPoisw/chrome-experiment.html' }
+            created_at => 'Fri Jun 20 16:02:52 +0900 2014',
+            user => { screen_name => 'Google Japan Blog' }},
+      ]},
+    { filename => 'slashdotjp.rdf',
+      TODO}
+);
+
+done_testing;
+
