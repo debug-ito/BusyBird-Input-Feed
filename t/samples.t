@@ -15,6 +15,7 @@ sub check_case {
         my $got = $got_statuses->[$i];
         my $exp = $case->{exp_partial}[$i];
         cmp_deeply $got, $exp, "$label: status $i OK";
+        is $got->{user}{profile_image_url}, undef, "$label: status $i: user.profile_image_url is not set";
     }
 }
 
