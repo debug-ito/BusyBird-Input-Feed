@@ -2,8 +2,19 @@ use strict;
 use warnings;
 use Test::More;
 use utf8;
-
 use BusyBird::Input::Feed;
+use Test::Deep 0.084 qw(cmp_deeply superhashof);
+use File::Spec;
+
+sub check_case {
+    my ($label, $got_statuses, $case) = @_;
+    is scalar(@$got_statuses), $case->{exp_num}, "$label: num of statuses OK";
+    foreach my $i (0 .. $#{$case->{exp_partial}}) {
+        my $got = $got_statuses->[$i];
+        my $exp = $case->{exp_partial}[$i];
+        cmp_deeply $got, superhashof($exp), "$label: status $i OK";
+    }
+}
 
 my $input = BusyBird::Input::Feed->new(use_favicon => 0);
 
@@ -26,7 +37,7 @@ my @testcases = (
             created_at => 'Mon Mar 25 05:10:30 +0000 2013',
             user => { screen_name => q{rt.cpan.org: Search Queue = 'future'} }},
           { id => 'https://rt.cpan.org/Ticket/Display.html?id=84189',
-            text => 'Behavior of repeat {...} foreach => [] may be counter-intuitive'
+            text => 'Behavior of repeat {...} foreach => [] may be counter-intuitive',
             busybird => { status_permalink => 'https://rt.cpan.org/Ticket/Display.html?id=84189' },
             created_at => 'Mon Mar 25 05:12:20 +0000 2013',
             user => { screen_name => q{rt.cpan.org: Search Queue = 'future'}}}
@@ -71,19 +82,41 @@ my @testcases = (
             text => 'あたらしい「ごちそうフォト」で、あなたがどんな食通かチェックしましょう。',
 
             ## if there are multiple <link>s, use rel="alternate".
-            busybird => { status_permalink => 'http://feedproxy.google.com/~r/GoogleJapanBlog/~3/RP_M-WXr_6I/blog-post.html' }
+            busybird => { status_permalink => 'http://feedproxy.google.com/~r/GoogleJapanBlog/~3/RP_M-WXr_6I/blog-post.html' },
             created_at => 'Mon Jul 07 11:50:02 +0900 2014',
             user => { screen_name => 'Google Japan Blog' }},
           
           { id => 'tag:blogger.com,1999:blog-20042392.post-4467811587369881889',
             text => '最新の Chrome Experiment でキック、ドリブル、シュートを楽しもう!',
-            busybird => { status_permalink => 'http://feedproxy.google.com/~r/GoogleJapanBlog/~3/qztQgCPoisw/chrome-experiment.html' }
+            busybird => { status_permalink => 'http://feedproxy.google.com/~r/GoogleJapanBlog/~3/qztQgCPoisw/chrome-experiment.html' },
             created_at => 'Fri Jun 20 16:02:52 +0900 2014',
             user => { screen_name => 'Google Japan Blog' }},
       ]},
     { filename => 'slashdotjp.rdf',
-      TODO}
+      exp_num => 13,
+      exp_partial => [
+          { id => 'http://linux.slashdot.jp/story/14/07/09/097242/',
+            text => 'ミラクル・リナックス、ソフトバンク・テクノロジーに買収される',
+            busybird => { status_permalink => 'http://linux.slashdot.jp/story/14/07/09/097242/' },
+            created_at => 'Wed Jul 09 09:44:00 +0000 2014',
+            user => { screen_name => 'スラッシュドット・ジャパン' }},
+          { id => 'http://yro.slashdot.jp/story/14/07/09/0533213/',
+            text => 'バイオハザードを手がけた三上真司氏の新作ホラーゲームはDLCでCERO Z相当になる',
+            busybird => { status_permalink => 'http://yro.slashdot.jp/story/14/07/09/0533213/' },
+            created_at => 'Wed Jul 09 08:55:00 +0000 2014',
+            user => { screen_name => 'スラッシュドット・ジャパン' }},
+      ]}
 );
+
+foreach my $case (@testcases) {
+    my $filepath = File::Spec->catfile(".", "t", "samples", $case->{filename});
+    check_case "$case->{filename} parse_file()", $input->parse_file($filepath), $case;
+    open my $file, "<", $filepath or die "Cannot open $filepath: $!";
+    my $data = do { local $/; <$file> };
+    check_case "$case->{filename} parse()", $input->parse($data), $case;
+    check_case "$case->{filename} parse_string()", $input->parse_string($data), $case;
+    close $file;
+}
 
 done_testing;
 

@@ -61,7 +61,7 @@ If it's defined and false, it won't use favicon.
 Convert the given C<$feed_xml_string> into L<BusyBird> C<$statuses>.
 C<parse()> method is an alias for C<parse_string()>.
 
-C<$feed_xml_string> is the XML data to be parsed. It should be a decoded character string.
+C<$feed_xml_string> is the XML data to be parsed. It should be an encoded octet string.
 
 Return value C<$statuses> is an array-ref of L<BusyBird> status objects.
 
