@@ -6,6 +6,7 @@ use DateTime::Format::ISO8601;
 use BusyBird::DateTime::Format;
 use DateTime;
 use Try::Tiny;
+use Encode qw(decode);
 
 our $VERSION = "0.01";
 
@@ -25,17 +26,19 @@ sub _make_timestamp_datetime {
     return BusyBird::DateTime::Format->parse_datetime($timestamp_str);
 }
 
+my $ENCODING = 'utf8';
+
 sub _make_status_from_item {
     my ($self, $feed_title, $feed_item) = @_;
     my $id = $feed_item->guid;
     $id = $feed_item->link if not defined $id;
     my $created_at_dt = $self->_make_timestamp_datetime($feed_item->pubDate);
     return {
-        id => $id,
-        text => $feed_item->title,
-        busybird => { status_permalink => $feed_item->link },
+        id => decode($ENCODING, $id),
+        text => decode($ENCODING, $feed_item->title),
+        busybird => { status_permalink => decode($ENCODING, $feed_item->link) },
         ($created_at_dt ? (created_at => BusyBird::DateTime::Format->format_datetime($created_at_dt)) : () ),
-        user => { screen_name => $feed_title },
+        user => { screen_name => decode($ENCODING, $feed_title) },
     };
 }
 
@@ -115,7 +118,8 @@ If it's defined and false, it won't use favicon.
 Convert the given C<$feed_xml_string> into L<BusyBird> C<$statuses>.
 C<parse()> method is an alias for C<parse_string()>.
 
-C<$feed_xml_string> is the XML data to be parsed. It should be an encoded octet string.
+C<$feed_xml_string> is the XML data to be parsed.
+Currently C<$feed_xml_string> must be a string encoded in UTF-8.
 
 Return value C<$statuses> is an array-ref of L<BusyBird> status objects.
 
