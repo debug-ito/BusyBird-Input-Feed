@@ -20,6 +20,7 @@ sub new {
 
 sub _make_timestamp_datetime {
     my ($self, $timestamp_str) = @_;
+    return undef if not defined $timestamp_str;
     if($timestamp_str =~ /^\d+$/) {
         return DateTime->from_epoch(epoch => $timestamp_str, time_zone => '+0000');
     }
@@ -37,7 +38,7 @@ sub _make_status_from_item {
         id => $id,
         text => $feed_item->title,
         busybird => { status_permalink => $feed_item->link },
-        ($created_at_dt ? (created_at => BusyBird::DateTime::Format->format_datetime($created_at_dt)) : () ),
+        created_at => ($created_at_dt ? BusyBird::DateTime::Format->format_datetime($created_at_dt) : undef ),
         user => { screen_name => $feed_title },
     };
 }

@@ -113,6 +113,16 @@ my @testcases = (
               busybird => sh( status_permalink => 'http://yro.slashdot.jp/story/14/07/09/0533213/' ),
               created_at => 'Wed Jul 09 08:55:00 +0000 2014',
               user => sh( screen_name => 'スラッシュドット・ジャパン' )),
+      ]},
+    { filename => 'pukiwiki_rss09.rss',
+      exp_num => 15,
+      exp_partial => [
+          ## both ID and timestamp are missing
+          sh( id => 'http://debugitos.main.jp/index.php?Ubuntu%2FTrusty%A5%A4%A5%F3%A5%B9%A5%C8%A1%BC%A5%EB%A5%E1%A5%E2',
+              text => 'Ubuntu/Trustyインストールメモ',
+              busybird => sh( status_permalink => 'http://debugitos.main.jp/index.php?Ubuntu%2FTrusty%A5%A4%A5%F3%A5%B9%A5%C8%A1%BC%A5%EB%A5%E1%A5%E2' ),
+              created_at => undef,
+              user => sh( screen_name => q{DebugIto's} )),
       ]}
 );
 
