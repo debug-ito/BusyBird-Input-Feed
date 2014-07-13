@@ -51,7 +51,10 @@ sub _get_favicon_url {
     my $favicon_url = $self->{favicon_detector}->detect($home_url);
     return undef if not defined $favicon_url;
     my $res = $self->{ua}->get($favicon_url);
-    return $res->is_success ? $favicon_url : undef;
+    return undef if !$res->is_success;
+    my $type = $res->header('Content-Type');
+    return undef if defined($type) && $type !~ /^image/i;
+    return $favicon_url;
 }
 
 sub _make_timestamp_datetime {
