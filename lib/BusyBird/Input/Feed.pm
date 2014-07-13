@@ -170,7 +170,7 @@ Convert the given C<$feed_xml_string> into L<BusyBird> C<$statuses>.
 C<parse()> method is an alias for C<parse_string()>.
 
 C<$feed_xml_string> is the XML data to be parsed.
-C<$feed_xml_string> must be a string encoded in UTF-8.
+It must be a string encoded in UTF-8.
 
 Return value C<$statuses> is an array-ref of L<BusyBird> status objects.
 
