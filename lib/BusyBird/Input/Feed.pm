@@ -6,7 +6,6 @@ use DateTime::Format::ISO8601;
 use BusyBird::DateTime::Format;
 use DateTime;
 use Try::Tiny;
-use Encode qw(decode);
 use Carp;
 
 our $VERSION = "0.01";
@@ -29,19 +28,17 @@ sub _make_timestamp_datetime {
     return BusyBird::DateTime::Format->parse_datetime($timestamp_str);
 }
 
-my $ENCODING = 'utf8';
-
 sub _make_status_from_item {
     my ($self, $feed_title, $feed_item) = @_;
     my $id = $feed_item->guid;
     $id = $feed_item->link if not defined $id;
     my $created_at_dt = $self->_make_timestamp_datetime($feed_item->pubDate);
     return {
-        id => decode($ENCODING, $id),
-        text => decode($ENCODING, $feed_item->title),
-        busybird => { status_permalink => decode($ENCODING, $feed_item->link) },
+        id => $id,
+        text => $feed_item->title,
+        busybird => { status_permalink => $feed_item->link },
         ($created_at_dt ? (created_at => BusyBird::DateTime::Format->format_datetime($created_at_dt)) : () ),
-        user => { screen_name => decode($ENCODING, $feed_title) },
+        user => { screen_name => $feed_title },
     };
 }
 
@@ -53,19 +50,19 @@ sub _make_statuses_from_feed {
 
 sub parse_string {
     my ($self, $string) = @_;
-    return $self->_make_statuses_from_feed(XML::FeedPP->new($string, -type => "string"));
+    return $self->_make_statuses_from_feed(XML::FeedPP->new($string, -type => "string", utf8_flag => 1));
 }
 
 *parse = *parse_string;
 
 sub parse_file {
     my ($self, $filename) = @_;
-    return $self->_make_statuses_from_feed(XML::FeedPP->new($filename, -type => "file"));
+    return $self->_make_statuses_from_feed(XML::FeedPP->new($filename, -type => "file", utf8_flag => 1));
 }
 
 sub parse_url {
     my ($self, $url) = @_;
-    return $self->_make_statuses_from_feed(XML::FeedPP->new($url, -type => "url"));
+    return $self->_make_statuses_from_feed(XML::FeedPP->new($url, -type => "url", utf8_flag => 1));
 }
 
 *parse_uri = *parse_url;
@@ -128,7 +125,7 @@ Convert the given C<$feed_xml_string> into L<BusyBird> C<$statuses>.
 C<parse()> method is an alias for C<parse_string()>.
 
 C<$feed_xml_string> is the XML data to be parsed.
-Currently C<$feed_xml_string> must be a string encoded in UTF-8.
+C<$feed_xml_string> must be a string encoded in UTF-8.
 
 Return value C<$statuses> is an array-ref of L<BusyBird> status objects.
 
@@ -137,12 +134,6 @@ If C<$feed_xml_string> is invalid, it croaks.
 =head2 $statuses = $input->parse_file($feed_xml_filename)
 
 Same as C<parse_string()> except C<parse_file()> reads the file named C<$feed_xml_filename> and converts its content.
-
-=begin comment
-
-... should we accept parameter to specify the file encoding?
-
-=end comment
 
 =head2 $statuses = $input->parse_url($feed_xml_url)
 
