@@ -17,6 +17,9 @@ $ua->env_proxy;
     ok $res->is_success, "Succeed to get favicon $got_status->{user}{profile_image_url}";
 }
 
+fail("TODO: testcase where favicon URL is the simple /favicon.ico");
+
+
 {
     my $got_statuses = $input->parse_file(File::Spec->catfile(qw(. t samples pukiwiki_rss09.rss)));
     my $got_status = $got_statuses->[0];

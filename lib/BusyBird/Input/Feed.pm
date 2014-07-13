@@ -7,6 +7,8 @@ use BusyBird::DateTime::Format;
 use DateTime;
 use Try::Tiny;
 use Carp;
+use WWW::Favicon ();
+use LWP::UserAgent;
 
 our $VERSION = "0.01";
 
@@ -14,8 +16,42 @@ our @CARP_NOT = qw(Try::Tiny XML::FeedPP);
 
 sub new {
     my ($class, %args) = @_;
-    my $self = bless { }, $class;
+    my $self = bless {
+        use_favicon => 1,
+        favicon_detector => WWW::Favicon->new,
+        ua => do {
+            my $ua = LWP::UserAgent->new;
+            $ua->env_proxy;
+            $ua->timeout(20);
+            $ua;
+        }
+    }, $class;
+    if(defined($args{use_favicon})) {
+        $self->{use_favicon} = $args{use_favicon};
+    }
     return $self;
+}
+
+sub _get_home_url {
+    my ($self, $feed, $statuses) = @_;
+    my $home_url = $feed->link;
+    return $home_url if defined $home_url;
+    
+    foreach my $status (@$statuses) {
+        $home_url = $status->{busybird}{status_permalink} if defined($status->{busybird});
+        return $home_url if defined $home_url;
+    }
+    return undef;
+}
+
+sub _get_favicon_url {
+    my ($self, $feed, $statuses) = @_;
+    my $home_url = $self->_get_home_url($feed, $statuses);
+    return undef if not defined $home_url;
+    my $favicon_url = $self->{favicon_detector}->detect($home_url);
+    return undef if not defined $favicon_url;
+    my $res = $self->{ua}->get($favicon_url);
+    return $res->is_success ? $favicon_url : undef;
 }
 
 sub _make_timestamp_datetime {
@@ -46,7 +82,12 @@ sub _make_status_from_item {
 sub _make_statuses_from_feed {
     my ($self, $feed) = @_;
     my $feed_title = $feed->title;
-    return [ map { $self->_make_status_from_item($feed_title, $_) } $feed->get_item ];
+    my $statuses = [ map { $self->_make_status_from_item($feed_title, $_) } $feed->get_item ];
+    return $statuses if !$self->{use_favicon};
+    my $favicon_url = $self->_get_favicon_url($feed, $statuses);
+    return $statuses if not defined $favicon_url;
+    $_->{user}{profile_image_url} = $favicon_url foreach @$statuses;
+    return $statuses;
 }
 
 sub parse_string {

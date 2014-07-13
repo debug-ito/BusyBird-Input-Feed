@@ -4,6 +4,8 @@ requires 'BusyBird::DateTime::Format' => '0';
 requires 'DateTime::Format::ISO8601' => '0';
 requires 'DateTime' => '0';
 requires 'Try::Tiny' => '0';
+requires 'WWW::Favicon' => '0';
+requires 'LWP::UserAgent' => '0';
 
 on 'test' => sub {
     requires 'Test::More' => "0";
