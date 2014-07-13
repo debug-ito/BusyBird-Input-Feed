@@ -7,8 +7,11 @@ use BusyBird::DateTime::Format;
 use DateTime;
 use Try::Tiny;
 use Encode qw(decode);
+use Carp;
 
 our $VERSION = "0.01";
+
+our @CARP_NOT = qw(Try::Tiny XML::FeedPP);
 
 sub new {
     my ($class, %args) = @_;
