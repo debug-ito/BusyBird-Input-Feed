@@ -63,6 +63,12 @@ sub parse_file {
     return $self->_make_statuses_from_feed(XML::FeedPP->new($filename, -type => "file"));
 }
 
+sub parse_url {
+    my ($self, $url) = @_;
+    return $self->_make_statuses_from_feed(XML::FeedPP->new($url, -type => "url"));
+}
+
+*parse_uri = *parse_url;
 
 1;
 __END__
