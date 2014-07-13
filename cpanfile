@@ -1,4 +1,10 @@
 
+requires 'XML::FeedPP' => '0';
+requires 'BusyBird::DateTime::Format' => '0';
+requires 'DateTime::Format::ISO8601' => '0';
+requires 'DateTime' => '0';
+requires 'Try::Tiny' => '0';
+
 on 'test' => sub {
     requires 'Test::More' => "0";
     requires 'Test::Deep' => '0.084';

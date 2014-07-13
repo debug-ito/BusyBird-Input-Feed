@@ -1,8 +1,62 @@
 package BusyBird::Input::Feed;
 use strict;
 use warnings;
+use XML::FeedPP;
+use DateTime::Format::ISO8601;
+use BusyBird::DateTime::Format;
+use DateTime;
+use Try::Tiny;
 
 our $VERSION = "0.01";
+
+sub new {
+    my ($class, %args) = @_;
+    my $self = bless { }, $class;
+    return $self;
+}
+
+sub _make_timestamp_datetime {
+    my ($self, $timestamp_str) = @_;
+    if($timestamp_str =~ /^\d+$/) {
+        return DateTime->from_epoch(epoch => $timestamp_str, time_zone => '+0000');
+    }
+    my $datetime = try { DateTime::Format::ISO8601->parse_datetime($timestamp_str) };
+    return $datetime if defined $datetime;
+    return BusyBird::DateTime::Format->parse_datetime($timestamp_str);
+}
+
+sub _make_status_from_item {
+    my ($self, $feed_title, $feed_item) = @_;
+    my $id = $feed_item->guid;
+    $id = $feed_item->link if not defined $id;
+    my $created_at_dt = $self->_make_timestamp_datetime($feed_item->pubDate);
+    return {
+        id => $id,
+        text => $feed_item->title,
+        busybird => { status_permalink => $feed_item->link },
+        ($created_at_dt ? (created_at => BusyBird::DateTime::Format->format_datetime($created_at_dt)) : () ),
+        user => { screen_name => $feed_title },
+    };
+}
+
+sub _make_statuses_from_feed {
+    my ($self, $feed) = @_;
+    my $feed_title = $feed->title;
+    return [ map { $self->_make_status_from_item($feed_title, $_) } $feed->get_item ];
+}
+
+sub parse_string {
+    my ($self, $string) = @_;
+    return $self->_make_statuses_from_feed(XML::FeedPP->new($string, -type => "string"));
+}
+
+*parse = *parse_string;
+
+sub parse_file {
+    my ($self, $filename) = @_;
+    return $self->_make_statuses_from_feed(XML::FeedPP->new($filename, -type => "file"));
+}
+
 
 1;
 __END__
