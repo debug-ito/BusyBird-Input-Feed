@@ -98,7 +98,10 @@ sub _parse_with_feedpp {
     my ($self, $feed_source, $feed_type) = @_;
     return $self->_make_statuses_from_feed(XML::FeedPP->new(
         $feed_source, -type => $feed_type,
-        utf8_flag => 1, xml_deref => 1, lwp_useragent => $self->{user_agent}
+        utf8_flag => 1, xml_deref => 1, lwp_useragent => $self->{user_agent},
+
+        ## FeedPP and TreePP mess up with User-Agent. It's pretty annoying.
+        user_agent => $self->{user_agent}->agent,
     ));
 }
 
