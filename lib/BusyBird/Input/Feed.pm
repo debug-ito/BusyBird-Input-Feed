@@ -93,21 +93,23 @@ sub _make_statuses_from_feed {
     return $statuses;
 }
 
+my %FEEDPP_OPTIONS = (utf8_flag => 1, xml_deref => 1);
+
 sub parse_string {
     my ($self, $string) = @_;
-    return $self->_make_statuses_from_feed(XML::FeedPP->new($string, -type => "string", utf8_flag => 1));
+    return $self->_make_statuses_from_feed(XML::FeedPP->new($string, %FEEDPP_OPTIONS, -type => "string"));
 }
 
 *parse = *parse_string;
 
 sub parse_file {
     my ($self, $filename) = @_;
-    return $self->_make_statuses_from_feed(XML::FeedPP->new($filename, -type => "file", utf8_flag => 1));
+    return $self->_make_statuses_from_feed(XML::FeedPP->new($filename, %FEEDPP_OPTIONS, -type => "file"));
 }
 
 sub parse_url {
     my ($self, $url) = @_;
-    return $self->_make_statuses_from_feed(XML::FeedPP->new($url, -type => "url", utf8_flag => 1));
+    return $self->_make_statuses_from_feed(XML::FeedPP->new($url, %FEEDPP_OPTIONS, -type => "url"));
 }
 
 *parse_uri = *parse_url;

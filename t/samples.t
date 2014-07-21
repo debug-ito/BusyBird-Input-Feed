@@ -123,6 +123,24 @@ my @testcases = (
               busybird => sh( status_permalink => 'http://debugitos.main.jp/index.php?Ubuntu%2FTrusty%A5%A4%A5%F3%A5%B9%A5%C8%A1%BC%A5%EB%A5%E1%A5%E2' ),
               created_at => undef,
               user => sh( screen_name => q{DebugIto's} )),
+      ]},
+    { filename => 'nick.rss',
+      exp_num => 20,
+      exp_partial => [
+          sh( id => 'http://www.nickandmore.com/?p=24392',
+
+              ## decode XML Entities (like &#8217;)
+              text => q{Disney XD’s “The 7D” Launches With Solid Ratings, App Hits 1.3M+ Downloads},
+              busybird => sh( status_permalink => 'http://www.nickandmore.com/2014/07/17/disney-xds-the-7d-launches-with-solid-ratings-app-hits-1-3m-downloads/' ),
+              created_at => 'Thu Jul 17 17:16:13 +0000 2014',
+              user => sh( screen_name => 'NICKandMORE' )),
+          sh( id => 'http://www.nickandmore.com/?p=24371',
+
+              ## XML Entities with &amp;
+              text => q{Disney Television Animation Announces “Haunted Mansion” Special, Three Pilots & Short-Form Series},
+              busybird => sh( status_permalink => 'http://www.nickandmore.com/2014/07/17/disney-television-animation-announces-haunted-mansion-special-three-pilots-short-form-series/' ),
+              created_at => 'Thu Jul 17 16:11:48 +0000 2014',
+              user => sh( screen_name => 'NICKandMORE' ))
       ]}
 );
 
