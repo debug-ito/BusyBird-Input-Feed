@@ -45,15 +45,17 @@ sub _get_home_url {
 
 sub _get_favicon_url {
     my ($self, $feed, $statuses) = @_;
-    my $home_url = $self->_get_home_url($feed, $statuses);
-    return undef if not defined $home_url;
-    my $favicon_url = $self->{favicon_detector}->detect($home_url);
-    return undef if not defined $favicon_url;
-    my $res = $self->{user_agent}->get($favicon_url);
-    return undef if !$res->is_success;
-    my $type = $res->header('Content-Type');
-    return undef if defined($type) && $type !~ /^image/i;
-    return $favicon_url;
+    return try {
+        my $home_url = $self->_get_home_url($feed, $statuses);
+        return undef if not defined $home_url;
+        my $favicon_url = $self->{favicon_detector}->detect($home_url);
+        return undef if not defined $favicon_url;
+        my $res = $self->{user_agent}->get($favicon_url);
+        return undef if !$res->is_success;
+        my $type = $res->header('Content-Type');
+        return undef if defined($type) && $type !~ /^image/i;
+        return $favicon_url;
+    };
 }
 
 sub _make_timestamp_datetime {
