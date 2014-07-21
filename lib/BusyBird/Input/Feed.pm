@@ -17,18 +17,17 @@ our @CARP_NOT = qw(Try::Tiny XML::FeedPP);
 sub new {
     my ($class, %args) = @_;
     my $self = bless {
-        use_favicon => 1,
+        use_favicon => defined($args{use_favicon}) ? $args{use_favicon} : 1,
         favicon_detector => WWW::Favicon->new,
-        ua => do {
+        user_agent => defined($args{user_agent}) ? $args{user_agent} : do {
             my $ua = LWP::UserAgent->new;
             $ua->env_proxy;
-            $ua->timeout(20);
+            $ua->timeout(30);
+            $ua->agent("BusyBird::Inpu::Feed-$VERSION");  ## some Web sites ban LWP::UserAgent's default UserAgent...
             $ua;
         }
     }, $class;
-    if(defined($args{use_favicon})) {
-        $self->{use_favicon} = $args{use_favicon};
-    }
+    $self->{favicon_detector}->ua($self->{user_agent});
     return $self;
 }
 
@@ -50,7 +49,7 @@ sub _get_favicon_url {
     return undef if not defined $home_url;
     my $favicon_url = $self->{favicon_detector}->detect($home_url);
     return undef if not defined $favicon_url;
-    my $res = $self->{ua}->get($favicon_url);
+    my $res = $self->{user_agent}->get($favicon_url);
     return undef if !$res->is_success;
     my $type = $res->header('Content-Type');
     return undef if defined($type) && $type !~ /^image/i;
@@ -93,23 +92,29 @@ sub _make_statuses_from_feed {
     return $statuses;
 }
 
-my %FEEDPP_OPTIONS = (utf8_flag => 1, xml_deref => 1);
+sub _parse_with_feedpp {
+    my ($self, $feed_source, $feed_type) = @_;
+    return $self->_make_statuses_from_feed(XML::FeedPP->new(
+        $feed_source, -type => $feed_type,
+        utf8_flag => 1, xml_deref => 1, lwp_useragent => $self->{user_agent}
+    ));
+}
 
 sub parse_string {
     my ($self, $string) = @_;
-    return $self->_make_statuses_from_feed(XML::FeedPP->new($string, %FEEDPP_OPTIONS, -type => "string"));
+    return $self->_parse_with_feedpp($string, "string");
 }
 
 *parse = *parse_string;
 
 sub parse_file {
     my ($self, $filename) = @_;
-    return $self->_make_statuses_from_feed(XML::FeedPP->new($filename, %FEEDPP_OPTIONS, -type => "file"));
+    return $self->_parse_with_feedpp($filename, "file");
 }
 
 sub parse_url {
     my ($self, $url) = @_;
-    return $self->_make_statuses_from_feed(XML::FeedPP->new($url, %FEEDPP_OPTIONS, -type => "url"));
+    return $self->_parse_with_feedpp($url, "url");
 }
 
 *parse_uri = *parse_url;
@@ -159,6 +164,10 @@ If true (or omitted or C<undef>), it tries to use the favicon of the Web site pr
 as the statuses' icons.
 
 If it's defined and false, it won't use favicon.
+
+=item C<user_agent> => L<LWP::UserAgent> object (optional)
+
+L<LWP::UserAgent> object for fetching documents.
 
 =back
 
