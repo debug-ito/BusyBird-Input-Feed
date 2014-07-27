@@ -7,6 +7,7 @@ requires 'Try::Tiny' => '0';
 requires 'WWW::Favicon' => '0';
 requires 'LWP::UserAgent' => '0';
 requires 'Carp' => '0';
+requires 'JSON' => '0';
 
 on 'test' => sub {
     requires 'Test::More' => "0";
