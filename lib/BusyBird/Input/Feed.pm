@@ -71,16 +71,27 @@ sub _make_timestamp_datetime {
 
 sub _make_status_from_item {
     my ($self, $feed_title, $feed_item) = @_;
-    my $id = $feed_item->guid;
-    $id = $feed_item->link if not defined $id;
     my $created_at_dt = $self->_make_timestamp_datetime($feed_item->pubDate);
-    return {
-        id => $id,
+    my $status = {
         text => $feed_item->title,
         busybird => { status_permalink => $feed_item->link },
         created_at => ($created_at_dt ? BusyBird::DateTime::Format->format_datetime($created_at_dt) : undef ),
         user => { screen_name => $feed_title },
     };
+    my $guid = $feed_item->guid;
+    my $item_id;
+    if(defined $guid) {
+        $item_id = $guid;
+        $status->{busybird}{original}{id} = $guid;
+    }else {
+        $item_id = $feed_item->link;
+    }
+    if(defined($created_at_dt) && defined($item_id)) {
+        $status->{id} = $created_at_dt->epoch . '|' . $item_id;
+    }elsif(defined($item_id)) {
+        $status->{id} = $item_id;
+    }
+    return $status;
 }
 
 sub _make_statuses_from_feed {
