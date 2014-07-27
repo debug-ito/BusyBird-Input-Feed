@@ -112,7 +112,7 @@ sub _parse_with_feedpp {
         utf8_flag => 1, xml_deref => 1, lwp_useragent => $self->{user_agent},
 
         ## FeedPP and TreePP mess up with User-Agent. It's pretty annoying.
-        user_agent => $self->{user_agent}->agent,
+        user_agent => scalar($self->{user_agent}->agent),
     ));
 }
 
