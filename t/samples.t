@@ -91,13 +91,17 @@ my @testcases = (
               
               ## if there are multiple <link>s, use rel="alternate".
               busybird => sh( status_permalink => 'http://feedproxy.google.com/~r/GoogleJapanBlog/~3/RP_M-WXr_6I/blog-post.html' ),
+
+              ## <updated> is used instead of <published>
               created_at => 'Mon Jul 07 11:50:02 +0900 2014',
               user => sh( screen_name => 'Google Japan Blog' )),
           
           sh( id => 'tag:blogger.com,1999:blog-20042392.post-4467811587369881889',
               text => '最新の Chrome Experiment でキック、ドリブル、シュートを楽しもう!',
               busybird => sh( status_permalink => 'http://feedproxy.google.com/~r/GoogleJapanBlog/~3/qztQgCPoisw/chrome-experiment.html' ),
-              created_at => 'Fri Jun 20 16:02:52 +0900 2014',
+
+              ## <published> is used when <updated> is missing
+              created_at => 'Fri Jun 20 15:28:00 +0900 2014',
               user => sh( screen_name => 'Google Japan Blog' )),
       ]},
     { filename => 'slashdotjp.rdf',
