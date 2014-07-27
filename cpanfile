@@ -6,12 +6,17 @@ requires 'DateTime' => '0';
 requires 'Try::Tiny' => '0';
 requires 'WWW::Favicon' => '0';
 requires 'LWP::UserAgent' => '0';
+requires 'Carp' => '0';
 
 on 'test' => sub {
     requires 'Test::More' => "0";
     requires 'Test::Deep' => '0.084';
     requires 'File::Spec' => '0';
     requires 'Test::Exception' => '0';
+};
+
+on 'develop' => sub {
+    requires 'Test::LWP::UserAgent' => '0';
 };
 
 on 'configure' => sub {
