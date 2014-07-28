@@ -9,6 +9,11 @@ my $input = BusyBird::Input::Feed->new;
 my $ua = LWP::UserAgent->new;
 $ua->env_proxy;
 
+if(!$ENV{BB_INPUT_FEED_NETWORK_TEST}) {
+    plan('skip_all', "Set BB_INPUT_FEED_NETWORK_TEST environment to enable the test");
+    exit;
+}
+
 {
     note('--- case: <link rel="shortcut icon"> exists');
     my $got_statuses = $input->parse_file(File::Spec->catfile(qw(. t samples stackoverflow.atom)));

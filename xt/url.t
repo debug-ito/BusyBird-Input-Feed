@@ -4,6 +4,11 @@ use Test::More;
 use Test::Deep qw(superhashof cmp_deeply ignore);
 use BusyBird::Input::Feed;
 
+if(!$ENV{BB_INPUT_FEED_NETWORK_TEST}) {
+    plan('skip_all', "Set BB_INPUT_FEED_NETWORK_TEST environment to enable the test");
+    exit;
+}
+
 sub sh { superhashof({@_}) }
 
 my $EXP_STATUS = sh(

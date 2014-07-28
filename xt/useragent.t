@@ -4,6 +4,11 @@ use Test::More;
 use LWP::UserAgent;
 use BusyBird::Input::Feed;
 
+if(!$ENV{BB_INPUT_FEED_NETWORK_TEST}) {
+    plan('skip_all', "Set BB_INPUT_FEED_NETWORK_TEST environment to enable the test");
+    exit;
+}
+
 my @request_log = ();
 my @agents = ();
 my $useragent = do {

@@ -8,6 +8,11 @@ use JSON qw(decode_json);
 use Test::LWP::UserAgent;
 use HTTP::Response;
 
+if(!$ENV{BB_INPUT_FEED_NETWORK_TEST}) {
+    plan('skip_all', "Set BB_INPUT_FEED_NETWORK_TEST environment to enable the test");
+    exit;
+}
+
 sub check_output {
     my ($output_json) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
