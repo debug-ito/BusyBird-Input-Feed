@@ -18,9 +18,18 @@ my $builder = Module::Build::Pluggable->new(
         file => ['README.pod'],
     },
     meta_add => {
+        'meta-spec' => {
+            version => 2,
+            url => 'https://metacpan.org/pod/CPAN::Meta::Spec',
+        },
         resources => {
-            bugtracker => 'https://github.com/debug-ito/BusyBird-Input-Feed/issues',
-            repository => 'git://github.com/debug-ito/BusyBird-Input-Feed.git',
+            bugtracker => {
+                web => 'https://github.com/debug-ito/BusyBird-Input-Feed/issues',
+            },
+            repository => {
+                url => 'git://github.com/debug-ito/BusyBird-Input-Feed.git',
+                web => 'https://github.com/debug-ito/BusyBird-Input-Feed',
+            },
         }
     }
 );
