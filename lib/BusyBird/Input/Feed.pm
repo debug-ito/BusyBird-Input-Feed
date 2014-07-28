@@ -27,7 +27,10 @@ sub new {
             $ua;
         }
     }, $class;
+
+    ## Note that WWW::Favicon#ua accessor method is not documented (as of version 0.03001)
     $self->{favicon_detector}->ua($self->{user_agent});
+    
     return $self;
 }
 
