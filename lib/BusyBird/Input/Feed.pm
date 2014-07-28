@@ -164,6 +164,8 @@ BusyBird::Input::Feed - input BusyBird statuses from RSS/Atom feed
 
 L<BusyBird::Input::Feed> converts RSS and Atom feeds into L<BusyBird> status objects.
 
+For convenience, an executable script L<busybird_input_feed> is bundled in this distribution.
+
 =head1 CLASS METHODS
 
 =head2 $input = BusyBird::Input::Feed->new(%args)
