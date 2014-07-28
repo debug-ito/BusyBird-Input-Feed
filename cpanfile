@@ -1,6 +1,6 @@
 
 requires 'XML::FeedPP' => '0';
-requires 'BusyBird::DateTime::Format' => '0';
+requires 'BusyBird::DateTime::Format' => '0.04';
 requires 'DateTime::Format::ISO8601' => '0';
 requires 'DateTime' => '0';
 requires 'Try::Tiny' => '0';
