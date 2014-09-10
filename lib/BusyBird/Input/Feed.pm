@@ -39,6 +39,7 @@ sub _extract_image_urls {
     my ($self, $feed_item) = @_;
     return () if $self->{image_max_num} == 0;
     my $content = $feed_item->description;
+    return () if !defined($content);
     my @urls = ();
     while(($self->{image_max_num} < 0 || @urls < $self->{image_max_num})
           && $content =~ m{<\s*img\s+[^>]*src\s*=\s*(['"])([^>]+?)\1[^>]*>}ig) {
