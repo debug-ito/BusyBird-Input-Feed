@@ -25,13 +25,26 @@ sub new {
             $ua->timeout(30);
             $ua->agent("BusyBird::Inpu::Feed-$VERSION");  ## some Web sites ban LWP::UserAgent's default UserAgent...
             $ua;
-        }
+        },
+        image_max_num => defined($args{image_max_num}) ? $args{image_max_num} : 3,
     }, $class;
 
     ## Note that WWW::Favicon#ua accessor method is not documented (as of version 0.03001)
     $self->{favicon_detector}->ua($self->{user_agent});
     
     return $self;
+}
+
+sub _extract_image_urls {
+    my ($self, $feed_item) = @_;
+    return () if $self->{image_max_num} == 0;
+    my $content = $feed_item->description;
+    my @urls = ();
+    while(($self->{image_max_num} < 0 || @urls < $self->{image_max_num})
+          && $content =~ m{<\s*img\s+[^>]*src\s*=\s*(['"])([^>]+?)\1[^>]*>}ig) {
+        push @urls, $2;
+    }
+    return @urls;
 }
 
 sub _get_home_url {
@@ -93,6 +106,10 @@ sub _make_status_from_item {
         $status->{id} = $created_at_dt->epoch . '|' . $item_id;
     }elsif(defined($item_id)) {
         $status->{id} = $item_id;
+    }
+    my @image_urls = $self->_extract_image_urls($feed_item);
+    if(@image_urls) {
+        $status->{extended_entities}{media} = [map { +{ media_url => $_, indices => [0,0] } } @image_urls];
     }
     return $status;
 }
@@ -189,6 +206,16 @@ If it's defined and false, it won't use favicon.
 =item C<user_agent> => L<LWP::UserAgent> object (optional)
 
 L<LWP::UserAgent> object for fetching documents.
+
+=item C<image_max_num> => INT (optional, default: 3)
+
+The maximum number of image URLs extracted from the feed item.
+
+If set to 0, it extracts no images. If set to a negative value, it extracts all image URLs from the feed item.
+
+The extracted image URLs are stored as Twitter Entities in the status's C<extended_entities> field,
+so that L<BusyBird> will render them.
+See L<BusyBird::Manual::Config/extended_entities> for detail.
 
 =back
 

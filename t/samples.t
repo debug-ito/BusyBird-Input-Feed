@@ -14,7 +14,9 @@ sub check_case {
     foreach my $i (0 .. $#{$case->{exp_partial}}) {
         my $got = $got_statuses->[$i];
         my $exp = $case->{exp_partial}[$i];
-        cmp_deeply $got, $exp, "$label: status $i OK";
+        cmp_deeply $got, $exp, "$label: status $i OK" or do {
+            diag(explain $got);
+        };
         is $got->{user}{profile_image_url}, undef, "$label: status $i: user.profile_image_url is not set";
     }
 }
@@ -60,13 +62,25 @@ my @testcases = (
               busybird => sh( status_permalink => 'http://rss.slashdot.org/~r/Slashdot/slashdot/~3/HdnfMBYoOr4/story01.htm',
                               original => sh( id => 'http://slashdot.feedsportal.com/c/35028/f/647410/s/3c35f940/sc/38/l/0Lhardware0Bslashdot0Borg0Cstory0C140C0A70C0A60C0A0A392340Cby0E20A450Ethe0Etop0Especies0Ewill0Eno0Elonger0Ebe0Ehumans0Eand0Ethat0Ecould0Ebe0Ea0Eproblem0Dutm0Isource0Frss10B0Amainlinkanon0Gutm0Imedium0Ffeed/story01.htm' ) ),
               created_at => 'Sun Jul 06 03:15:00 +0000 2014',
-              user => sh( screen_name => 'Slashdot' )),
+              user => sh( screen_name => 'Slashdot' ),
+
+              ## extract <img>s from HTML content. Up to 3 images by default.
+              extended_entities => sh(media => [
+                  sh(media_url => 'http://a.fsdn.com/sd/twitter_icon_large.png'),
+                  sh(media_url => 'http://a.fsdn.com/sd/facebook_icon_large.png'),
+                  sh(media_url => 'http://www.gstatic.com/images/icons/gplus-16.png'),
+              ])),
           sh( id => '1404606780|http://slashdot.feedsportal.com/c/35028/f/647410/s/3c35c953/sc/32/l/0Lscience0Bslashdot0Borg0Cstory0C140C0A70C0A60C0A0A42540Ctwo0Eearth0Elike0Eexoplanets0Edont0Eactually0Eexist0Dutm0Isource0Frss10B0Amainlinkanon0Gutm0Imedium0Ffeed/story01.htm',
               text => q{Two Earth-Like Exoplanets Don't Actually Exist},
               busybird => sh( status_permalink => 'http://rss.slashdot.org/~r/Slashdot/slashdot/~3/NcsdVQtQOQQ/story01.htm',
                               original => sh( id => 'http://slashdot.feedsportal.com/c/35028/f/647410/s/3c35c953/sc/32/l/0Lscience0Bslashdot0Borg0Cstory0C140C0A70C0A60C0A0A42540Ctwo0Eearth0Elike0Eexoplanets0Edont0Eactually0Eexist0Dutm0Isource0Frss10B0Amainlinkanon0Gutm0Imedium0Ffeed/story01.htm' ) ),
               created_at => 'Sun Jul 06 00:33:00 +0000 2014',
-              user => sh( screen_name => 'Slashdot' )),
+              user => sh( screen_name => 'Slashdot' ),
+              extended_entities => sh(media => [
+                  sh(media_url => 'http://a.fsdn.com/sd/twitter_icon_large.png'),
+                  sh(media_url => 'http://a.fsdn.com/sd/facebook_icon_large.png'),
+                  sh(media_url => 'http://www.gstatic.com/images/icons/gplus-16.png'),
+              ])),
       ]},
     { filename => 'stackoverflow.atom',
       exp_num => 30,
@@ -100,7 +114,13 @@ my @testcases = (
 
               ## <updated> is used instead of <published>
               created_at => 'Mon Jul 07 11:50:02 +0900 2014',
-              user => sh( screen_name => 'Google Japan Blog' )),
+              user => sh( screen_name => 'Google Japan Blog' ),
+
+              extended_entities => sh( media => [
+                  sh(media_url => 'http://1.bp.blogspot.com/-eYSw5ZyZ7Ec/U7YgVYLF3TI/AAAAAAAAM_8/FPpTqUyesk0/s450/gochiphototop1.png'),
+                  sh(media_url => 'http://1.bp.blogspot.com/-bp_kUa_Z8uQ/U7Yip34vN-I/AAAAAAAANAU/ktJQhMvf3BQ/s500/gochiprofile.png'),
+                  sh(media_url => 'http://4.bp.blogspot.com/-pJkRMfPc2m4/U7Yi-Vm4pvI/AAAAAAAANAc/EbXv8oPCyBM/s100/genre_0011.png'),
+              ] )),
           
           sh( id => '1403245680|tag:blogger.com,1999:blog-20042392.post-4467811587369881889',
               text => '最新の Chrome Experiment でキック、ドリブル、シュートを楽しもう!',
@@ -109,7 +129,11 @@ my @testcases = (
 
               ## <published> is used when <updated> is missing
               created_at => 'Fri Jun 20 15:28:00 +0900 2014',
-              user => sh( screen_name => 'Google Japan Blog' )),
+              user => sh( screen_name => 'Google Japan Blog' ),
+
+              extended_entities => sh(media => [
+                  sh(media_url => 'http://feeds.feedburner.com/~r/GoogleJapanBlog/~4/qztQgCPoisw')
+              ])),
       ]},
     { filename => 'slashdotjp.rdf',
       exp_num => 13,
