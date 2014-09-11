@@ -9,6 +9,7 @@ use Try::Tiny;
 use Carp;
 use WWW::Favicon ();
 use LWP::UserAgent;
+use URI;
 
 our $VERSION = "0.03";
 
@@ -35,15 +36,44 @@ sub new {
     return $self;
 }
 
+sub _get_url_head_and_dir {
+    my ($url_raw) = @_;
+    return (undef, undef) if not defined $url_raw;
+    my $url = URI->new($url_raw);
+    my $scheme = $url->scheme;
+    my $authority = $url->authority;
+    return (undef, undef) if !$scheme || !$authority;
+    my $url_head = "$scheme://$authority";
+    my $url_dir;
+    my $path = $url->path;
+    if($path =~ m{^(.*/)}i) {
+        $url_dir = $1;
+    }else {
+        $url_dir = "/";
+    }
+    return ($url_head, $url_dir);
+}
+
 sub _extract_image_urls {
     my ($self, $feed_item) = @_;
     return () if $self->{image_max_num} == 0;
     my $content = $feed_item->description;
     return () if !defined($content);
+    my ($url_head, $url_dir) = _get_url_head_and_dir($feed_item->link);
     my @urls = ();
     while(($self->{image_max_num} < 0 || @urls < $self->{image_max_num})
           && $content =~ m{<\s*img\s+[^>]*src\s*=\s*(['"])([^>]+?)\1[^>]*>}ig) {
-        push @urls, $2;
+        my $url = URI->new($2);
+        if(!$url->scheme) {
+            ## Only "path" segment is in the src attribute.
+            next if !defined($url_head) || !defined($url_dir);
+            if(substr("$url", 0, 1) eq "/") {
+                $url = "$url_head$url";
+            }else {
+                $url = "$url_dir$url";
+            }
+        }
+        push @urls, "$url";
     }
     return @urls;
 }

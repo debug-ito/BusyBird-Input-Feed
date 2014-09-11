@@ -178,6 +178,28 @@ my @testcases = (
                               original => sh( id => 'http://www.nickandmore.com/?p=24371' )),
               created_at => 'Thu Jul 17 16:11:48 +0000 2014',
               user => sh( screen_name => 'NICKandMORE' ))
+      ]},
+    { filename => 'turner_press.rss',
+      exp_num => 10,
+      exp_partial => [
+          sh( id => '1410386063|7606 at https://pressroom.turner.com',
+              text => 'Mike Tyson Mysteries',
+              busybird => sh( status_permalink => 'https://pressroom.turner.com/us/adult-swim/mike-tyson-mysteries-1',
+                              original => sh( id => '7606 at https://pressroom.turner.com' )),
+              created_at => 'Wed Sep 10 21:54:23 +0000 2014',
+              user => sh( screen_name => 'Turner Press Site' )),
+          sh( id => '1410385988|7605 at https://pressroom.turner.com',
+              text => 'Mike Tyson Mysteries',
+              busybird => sh( status_permalink => 'https://pressroom.turner.com/us/adult-swim/mike-tyson-mysteries-0',
+                              original => sh( id => '7605 at https://pressroom.turner.com' )),
+              created_at => 'Wed Sep 10 21:53:08 +0000 2014',
+              user => sh( screen_name => 'Turner Press Site' ),
+              extended_entities => sh(media => [
+
+                  ## In the original feed data, only the path is in the src attr in <img> tag. In this case,
+                  ## the permalink's scheme and host should complement the link.
+                  sh(media_url => 'https://pressroom.turner.com/modules/file/icons/image-x-generic.png')
+              ]))
       ]}
 );
 
