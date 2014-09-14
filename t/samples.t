@@ -200,7 +200,33 @@ my @testcases = (
                   ## the permalink's scheme and host should complement the link.
                   sh(media_url => 'https://pressroom.turner.com/modules/file/icons/image-x-generic.png')
               ]))
-      ]}
+      ]},
+    { filename => 'img_paths.rss',
+      exp_num => 2,
+
+      ## test extraction of media_urls from <img> tags with path-only src attributes.
+      exp_partial => [
+          sh( id => '1410688800|img_paths:02',
+              text => 'link ends with non-slash',
+              busybird => sh( status_permalink => 'http://example.com/foo/bar/buzz.html',
+                              original => sh( id => 'img_paths:02' )),
+              created_at => 'Sun Sep 14 10:00:00 +0000 2014',
+              user => sh( screen_name => 'Feed for testing img paths' ),
+              extended_entities => sh(media => [
+                  sh(media_url => 'http://example.com/foo/bar/relative/path.png'),
+                  sh(media_url => 'http://example.com/absolute/path.png')
+              ])),
+          sh( id => '1410685200|img_paths:01',
+              text => 'link ends with slash',
+              busybird => sh( status_permalink => 'http://example.com/foo/bar/',
+                              original => sh( id => 'img_paths:01' )),
+              created_at => 'Sun Sep 14 09:00:00 +0000 2014',
+              user => sh( screen_name => 'Feed for testing img paths' ),
+              extended_entities => sh(media => [
+                  sh(media_url => 'http://example.com/foo/bar/relative/path.png'),
+                  sh(media_url => 'http://example.com/absolute/path.png')
+              ]))
+      ]},
 );
 
 foreach my $case (@testcases) {

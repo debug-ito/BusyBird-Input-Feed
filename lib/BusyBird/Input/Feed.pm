@@ -70,7 +70,7 @@ sub _extract_image_urls {
             if(substr("$url", 0, 1) eq "/") {
                 $url = "$url_head$url";
             }else {
-                $url = "$url_dir$url";
+                $url = "$url_head$url_dir$url";
             }
         }
         push @urls, "$url";
