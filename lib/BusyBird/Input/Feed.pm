@@ -11,7 +11,7 @@ use WWW::Favicon ();
 use LWP::UserAgent;
 use URI;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 our @CARP_NOT = qw(Try::Tiny XML::FeedPP);
 
