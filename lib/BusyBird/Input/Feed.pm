@@ -81,7 +81,9 @@ sub _extract_image_urls {
 sub _get_home_url {
     my ($self, $feed, $statuses) = @_;
     my $home_url = $feed->link;
-    return $home_url if defined $home_url;
+    if(defined($home_url) && $home_url =~ m{^https?://}i) {
+        return $home_url;
+    }
     
     foreach my $status (@$statuses) {
         $home_url = $status->{busybird}{status_permalink} if defined($status->{busybird});
