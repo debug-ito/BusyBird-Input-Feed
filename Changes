@@ -1,5 +1,10 @@
 Revision history for BusyBird-Input-Feed
 
+0.06    2017-06-02
+        [BUG FIX]
+        - Fix favicon detector. It now ignores the feed's "link" tag
+          if it doesn't look like HTTP or HTTPS URL.
+
 0.05    2014-09-15
         - Fix documentation. No changes to the code.
 
