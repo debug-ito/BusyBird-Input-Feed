@@ -1,5 +1,10 @@
 Revision history for BusyBird-Input-Feed
 
+0.07    2017-06-04
+        [BUG FIX]
+        - Fix warnings when there is no <title> or <link> tag (or its content)
+          in a feed item.
+
 0.06    2017-06-02
         [BUG FIX]
         - Fix favicon detector. It now ignores the feed's "link" tag
