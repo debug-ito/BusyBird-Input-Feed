@@ -1,6 +1,7 @@
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use Test::More;
+use Test::Warnings;
 use BusyBird::Input::Feed;
 use File::Spec;
 
