@@ -121,9 +121,12 @@ sub _make_timestamp_datetime {
 sub _make_status_from_item {
     my ($self, $feed_title, $feed_item) = @_;
     my $created_at_dt = $self->_make_timestamp_datetime($feed_item->pubDate);
+    my $text = $feed_item->title;
+    $text = "" if !defined($text);
+    my $permalink = $feed_item->link;
     my $status = {
-        text => $feed_item->title,
-        busybird => { status_permalink => $feed_item->link },
+        text => $text,
+        busybird => { defined($permalink) ? (status_permalink => $permalink) : () },
         created_at => ($created_at_dt ? BusyBird::DateTime::Format->format_datetime($created_at_dt) : undef ),
         user => { screen_name => $feed_title },
     };
